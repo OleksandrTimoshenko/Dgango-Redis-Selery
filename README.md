@@ -4,6 +4,8 @@ project now developing
 
 to start and test it use
 
+cp ./dotenv.sample ./.env
+
 virtualenv env
 
 source ./env/bin/activate
@@ -14,24 +16,18 @@ pip install -r requirements.txt
 
 export CELERY_BROKER_URL="redis://localhost/0"
 
+export REDIS_URL=redis://localhost
+
 export SECRET_KEY="my_stong_secret_key"
 
 docker-compose up -d    # starting Redis container
 
 python manage.py migrate
 
+celery -A project beat -l INFO
+
 celery -A project worker -l INFO    # start worker
 
-testing
+python manage.py runserver # if you run it the first time you should wait for data from the worker
 
-python ./manage.py shell
-
->>> from movies.tasks import add, mul, xsum
-
->>> res = add.delay(2,3)
-
->>> res.get()
-
-To start project:
-
-python manage.py runserver
+(docker setup now developing...)
