@@ -14,17 +14,13 @@ cd ./backend
 
 pip install -r requirements.txt
 
-export CELERY_BROKER_URL="redis://localhost/0"
-
-export REDIS_URL=redis://localhost
-
-export SECRET_KEY="my_stong_secret_key"
+export CELERY_BROKER_URL="redis://localhost/0" && export REDIS_URL=redis://localhost && export SECRET_KEY="my_stong_secret_key"
 
 docker-compose up -d    # starting Redis container
 
 python manage.py migrate
 
-celery -A project beat -l INFO
+celery -A project beat -l INFO # (now interval=1m)
 
 celery -A project worker -l INFO    # start worker
 

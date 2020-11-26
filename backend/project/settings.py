@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 
 from pathlib import Path
 import os
+from celery.schedules import crontab
+import movies.tasks
 
 CELERY_TIMEZONE = "Australia/Tasmania"
 CELERY_TASK_TRACK_STARTED = True
@@ -23,6 +25,13 @@ CELERY_CACHE_BACKEND = 'django-cache'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
+
+CELERY_BEAT_SCHEDULE = {
+    "set_cache": {
+        "task": "movies.tasks.set_cache",
+        "schedule": crontab(minute="*/1"),
+    },
+}
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
