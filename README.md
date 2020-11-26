@@ -2,28 +2,10 @@
 
 project now developing
 
-to start and test it use
+to start project use
 
 cp ./dotenv.sample ./.env
 
-virtualenv env
+docker-compose up
 
-source ./env/bin/activate
-
-cd ./backend
-
-pip install -r requirements.txt
-
-export CELERY_BROKER_URL="redis://localhost/0" && export REDIS_URL=redis://localhost && export SECRET_KEY="my_stong_secret_key"
-
-docker-compose up -d    # starting Redis container
-
-python manage.py migrate
-
-celery -A project beat -l INFO # (now interval=1m)
-
-celery -A project worker -l INFO    # start worker
-
-python manage.py runserver # if you run it the first time you should wait for data from the worker
-
-(docker setup now developing...)
+(you can see the wait_for_data page before celery add data to the cache, >= 2 min.)
