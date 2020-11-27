@@ -1,0 +1,75 @@
+- name: server
+  hosts: all
+  become: True
+  gather_facts: no
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  pre_tasks:
+    - name: Wait for system to become reachable
+      wait_for_connection:
+
+    - name: Gather facts for first time
+      setup:
+    - apt:
+        upgrade: yes
+        update_cache: yes
+        cache_valid_time: 86400 #One day
+  roles:
+    - role: geerlingguy.pip
+      pip_package: python3-pip
+      pip_executable: pip3
+      pip_install_packages:
+        - name: docker
+        - name: docker-compose
+        - name: jsondiff
+    - role: geerlingguy.docker
+      docker_install_compose: true
+
+  tasks:
+    - name: Creating .env file
+      copy:
+        src: ./dotenv.sample
+        dest: /opt/.env
+
+    - name: Copy docker-swarm file
+      copy:
+        src: ./docker-swarm.yaml
+        dest: /opt/docker-swarm.yaml
+
+    - name: Copy backend files
+      copy:
+        src: ./backend/
+        dest: /opt/
+
+    - name: Build container image
+      docker_image:
+        path: /opt/
+        name: celery_and_redis
+    
+    - name: Set permissions to entrypoint.celery
+      file: 
+        dest: /opt/entrypoint.celery.sh
+        mode: a+x
+
+    - name: Set permissions to entrypoint.backend
+      file: 
+        dest: /opt/entrypoint.backend.sh 
+        mode: a+x        
+        
+    - name: Init a new swarm with default parameters
+      docker_swarm:
+        state: present
+        advertise_addr: "10.2.2.25"
+
+    #- name: Log into DockerHub
+    #  community.general.docker_login:
+    #    username: kharandziuk
+    #    password: "{{ github_token }}"
+    #    url: ghcr.io
+
+    - name: Deploy stack from a compose file
+      docker_stack:
+        state: present
+        name: backend
+        compose:
+          - /opt/docker-swarm.yaml
