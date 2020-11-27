@@ -1,8 +1,12 @@
 # Django-Redis-Celery
 
-project now developing
+This project shows how we can use the celery worker with Redis broker and Django project
 
-to start project use
+### Srart project with vagrant
+
+vagrant up
+
+### Srart project with docker
 
 cp ./dotenv.sample ./.env
 
