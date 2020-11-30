@@ -1,7 +1,8 @@
+---
 - name: server
   hosts: all
-  become: True
-  gather_facts: no
+  become: true
+  gather_facts: false
   vars:
     ansible_python_interpreter: /usr/bin/python3
   pre_tasks:
@@ -16,8 +17,8 @@
     - name: upgrade apt
       apt:
         upgrade: 'yes'
-        update_cache: yes
-        cache_valid_time: 86400 #One day
+        update_cache: true
+        cache_valid_time: 86400   # One day
   roles:
     - role: geerlingguy.pip
       pip_package: python3-pip
@@ -49,26 +50,26 @@
       docker_image:
         build:
           path: /opt/
-          pull: yes
+          pull: true
         name: celery_and_redis
         source: build
-    
+
     - name: Set permissions to entrypoint.celery
-      file: 
+      file:
         dest: /opt/entrypoint.celery.sh
         mode: a+x
 
     - name: Set permissions to entrypoint.backend
-      file: 
-        dest: /opt/entrypoint.backend.sh 
-        mode: a+x        
-        
+      file:
+        dest: /opt/entrypoint.backend.sh
+        mode: a+x
+
     - name: Init a new swarm with default parameters
       docker_swarm:
         state: present
         advertise_addr: "10.2.2.25"
 
-    #- name: Log into DockerHub
+    # - name: Log into DockerHub
     #  community.general.docker_login:
     #    username: kharandziuk
     #    password: "{{ github_token }}"

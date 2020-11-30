@@ -13,4 +13,3 @@ class TestGetSomething(TestCase):
         client = Client()
         response = client.get(path=path)
         self.assertEqual(response.status_code, 301)
-        

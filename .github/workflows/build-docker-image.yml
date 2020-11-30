@@ -16,7 +16,7 @@ jobs:
           step: start
           token: ${{ secrets.API_TOKEN }}
           env: staging
-   
+
       - uses: actions/checkout@v2
       - name: Testing docker deploy
         run: |
