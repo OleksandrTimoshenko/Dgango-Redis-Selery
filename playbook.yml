@@ -7,11 +7,15 @@
   pre_tasks:
     - name: Wait for system to become reachable
       wait_for_connection:
+        timeout: 600
 
     - name: Gather facts for first time
       setup:
-    - apt:
-        upgrade: yes
+        gather_subset: '!all'
+
+    - name: upgrade apt
+      apt:
+        upgrade: 'yes'
         update_cache: yes
         cache_valid_time: 86400 #One day
   roles:
@@ -43,8 +47,11 @@
 
     - name: Build container image
       docker_image:
-        path: /opt/
+        build:
+          path: /opt/
+          pull: yes
         name: celery_and_redis
+        source: build
     
     - name: Set permissions to entrypoint.celery
       file: 
