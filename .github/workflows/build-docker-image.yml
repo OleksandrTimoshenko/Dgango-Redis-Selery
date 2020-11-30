@@ -1,0 +1,33 @@
+name: Deployment testing
+
+on:
+  push:
+    branches: [ main, testing ]
+
+jobs:
+  build-docker-image:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: start deployment
+        uses: bobheadxi/deployments@master
+        id: deployment
+        with:
+          step: start
+          token: ${{ secrets.API_TOKEN }}
+          env: staging
+   
+      - uses: actions/checkout@v2
+      - name: Testing docker deploy
+        run: |
+         cp ./dotenv.sample ./.env
+         docker-compose -f docker-compose.yaml -f docker-compose.test.override.yaml up --exit-code-from test
+
+      - name: update deployment status
+        uses: bobheadxi/deployments@master
+        if: always()
+        with:
+          step: finish
+          token: ${{ secrets.API_TOKEN }}
+          status: ${{ job.status }}
+          deployment_id: ${{ steps.deployment.outputs.deployment_id }}
