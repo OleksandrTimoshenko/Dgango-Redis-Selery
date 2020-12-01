@@ -1,8 +1,7 @@
-name: Deployment testing
+name: docker-deployment
 
 on:
-  push:
-    branches: [ main, testing ]
+  workflow_dispatch:
 
 jobs:
   build-docker-image:
