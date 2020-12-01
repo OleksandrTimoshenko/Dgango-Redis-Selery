@@ -1,0 +1,26 @@
+name: run pre-commit
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+
+jobs:
+    pre-commit-validate:
+      runs-on: ubuntu-latest
+
+      steps:
+        - uses: actions/checkout@v2
+        - uses: actions/setup-python@v2
+          with:
+            python-version: '3.8'
+        - uses: pre-commit/action@v2.0.0
+          with:
+            extra_args: --all-files
+
+        - name: Invoke build-docker workflow
+          uses: benc-uk/workflow-dispatch@v1
+          with:
+            workflow: docker-deployment
+            token: ${{ secrets.API_TOKEN }}
